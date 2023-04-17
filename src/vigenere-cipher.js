@@ -20,13 +20,67 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  constructor(mode = true) {
+    this.mode = mode;
   }
-  decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+
+  encrypt(msg, key) {
+    if (typeof msg !== 'string' || typeof key !== 'string' ) {
+      throw new Error('Incorrect arguments!');
+    }
+    msg = msg.toUpperCase().split('');
+    key = key.toUpperCase().split('');
+
+    while (key.length < msg.length) {
+      key = key.concat(key);
+    }
+
+    let result = [];
+    for (let idx = 0, keyIdx = 0; idx < msg.length; idx++) {
+      const element = msg[idx];
+      if (element.match(/[A-Z]/)) {
+        let row = this.alphabet.indexOf(element);
+        let col = this.alphabet.indexOf(key[keyIdx]);
+        let encChar = this.alphabet.charAt((row + col) % 26);
+        result.push(encChar);
+        keyIdx++;
+      } else {
+        result.push(element);
+      }
+    }
+
+    return this.mode ? result.join('') : result.reverse().join('');
+  }
+
+  decrypt(encMsg, key) {
+    if (typeof encMsg !== 'string' || typeof key !== 'string' ) {
+      throw new Error('Incorrect arguments!');
+    }
+    encMsg = encMsg.toUpperCase().split('');
+    key = key.toUpperCase().split('');
+
+    while (key.length < encMsg.length) {
+      key = key.concat(key);
+    }
+
+    let result = [];
+    for (let idx = 0, keyIdx = 0; idx < encMsg.length; idx++) {
+      const element = encMsg[idx];
+      if (element.match(/[A-Z]/)) {
+        let row = this.alphabet.indexOf(key[keyIdx]);
+        let col = this.alphabet.indexOf(encMsg[idx]);
+        let char = this.alphabet.charAt((26 - row + col) % 26);
+
+        result.push(char);
+        keyIdx++;
+      } else {
+        result.push(element);
+      }
+    }
+
+    return this.mode ? result.join('') : result.reverse().join('');
   }
 }
 
